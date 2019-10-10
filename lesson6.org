@@ -1,0 +1,94 @@
+#+TITLE: Book keepping app
+#+PROPERTY: header-args :tangle ~/Dropbox/course_material/6_1_project_files/booklist/app.js 
+
+* First we have to create the constructor for the book object and ui object
+  
+#+begin_src js :noweb yes
+    function Book(title, author, isbn) {
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+    }
+
+    function UI() {}
+#+end_src
+
+* Creating methods for the object using prototype
+** the addBookToList prototype is used to insert html snippet to the existing dom.
+   we basically do it by selecting the dom element and then create an extra
+   element within that parent element
+   
+ #+begin_src js
+     UI.prototype.addBookToList = function(book) {
+         const list = document.getElementById('book-list');
+
+         const row = document.createElement('tr');
+
+         row.innerHTML = `
+     <td>${book.title}</td>
+     <td>${book.author}</td>
+     <td>${book.isbn}</td>
+     <td><a href="#" class="delete">X<a></td>
+     `
+     list.appendChild(row);
+   };
+ #+end_src
+
+** this is a prototype to clear out the fields after submmiting
+   so we now can just grab the element by id and set the content of the element
+   to an empty string.
+ 
+ #+begin_src js
+   UI.prototype.clearField = function() {
+       document.getElementById('title').value = '';
+       document.getElementById('author').value = '';
+       document.getElementById('isbn').value = '';
+   };
+ #+end_src
+** create a prototype to display the alert 
+   we have to create a div element with the desired className as well as the
+   message. Now we have to grab the container in which the form is contained.
+   The idea is that we will insert the div element within the container but
+   before the book-form. We can do that by grab the container element and the
+   using the insertBefore methods to... well insert Before.
+   
+ #+begin_src js 
+   UI.prototype.showAlert = function(message, className) {
+       const div = document.createElement('div');
+    
+   div.className = `alert ${className}`;
+   div.appendChild(document.createTextNode(message));
+   const container = document.querySelector('.container');
+   const form = document.querySelector('#book-form');
+   container.insertBefore(div, form);
+   setTimeout(function(){
+       document.querySelector('.alert').remove();
+   },3000);
+   }
+ #+end_src
+
+
+ define a event handler to handle the submit button, 
+ when the button is submitted, the book and the ui instance is instantiated,
+ calling the function define in the prototype is pretty much the same as any other oop.
+
+ #+begin_src js
+   document.getElementById('book-form').addEventListener('submit', function(e) {
+       const title = document.getElementById('title').value,
+             author = document.getElementById('author').value,
+             isbn = document.getElementById('isbn').value;
+
+       const book = new Book(title, author, isbn);
+       const ui = new UI();
+
+       if(title == '' | author == '' | isbn == ''){
+           ui.showAlert('this is an alert', 'error');
+       } else {
+           ui.addBookToList(book);
+           ui.showAlert('this is an success', 'success');
+           ui.clearField();
+       }
+       e.preventDefault();
+   });
+ #+end_src
+

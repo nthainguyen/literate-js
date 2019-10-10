@@ -1,0 +1,118 @@
+#+TITLE: The javascripts lesson
+#+PROPERTY: header-args :tangle ~/Dropbox/course_material/5_1_project_files/js_sandbox/app.js 
+
+#+name: no1
+#+begin_src js :noweb yes
+    function Person(firstName, lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    Person.prototype.greeting = function(){
+        return `hello there ${this.firstName} ${this.lastName}`;
+    }
+
+#+end_src
+
+
+In order to make customer to be define as a person, we have to make the customer object inherits from the person object
+The following code block is the way to do it
+Very different from the class based inheritance like in python 
+#+begin_src js :noweb yes
+Customer.prototype = Object.create(Person.prototype);
+Customer.prototype.constructor = Customer;
+#+end_src
+ 
+
+#+begin_src js :noweb yes
+  const person1 = new Person('John', 'Doe');
+
+  function Customer(firstName, lastName, phone, membership) {
+      Person.call(this, firstName, lastName);
+
+      this.phone = phone;
+      this.membership = membership;
+  }
+
+  const customer1 = new Customer('Tom', 'Smith', '555-555-5555', 'Standard');
+
+  console.log(customer1);
+
+  console.log(customer1.greeting())
+#+end_src
+
+* Create object prototype with Object.create()
+
+#+begin_src js
+  const personPrototype = {
+      greeting: function() {
+          return `Hello there ${this.firstName} ${this.lastName}`;
+      },
+      getMarried: function(newLastName) {
+          this.lastName = newLastName;
+      }
+  }
+
+  const mary = Object.create(personPrototype);
+  mary.firstName = 'Mary';
+  mary.lastName = 'Williams';
+  mary.age = 30;
+  mary.getMarried('thompson');
+
+  console.log(mary.greeting());
+#+end_src
+
+* ES6 class
+
+#+begin_src js
+  class newPerson {
+      constructor(firstName, lastName,dob) {
+          this.firstName = firstName;
+          this.lastName = lastName;
+          this.birthday  = new Date(dob);
+      }
+    
+    calculatedAge() {
+        const diff = Date.now() - this.birthday.getTime();
+        const ageDate = new Date(diff);
+        return Math.abs(ageDate.getUTCFullYear() - 1970);
+    }
+  }
+
+
+  const marry = new newPerson('Marry', 'Williams', 11-13-1980);
+
+  console.log(marry.calculatedAge());
+#+end_src
+
+** inheritance or subclass in es6
+
+  the following example create the customers class that inherits from the People class. 
+  We can call the greeting method from the customers instances even though the customers class does not have that method
+  Basically es6 class is just syntactic sugar that works the same as prototype in es5
+#+begin_src js
+  class People{
+      constructor(firstName, lastName) {
+          this.firstName = firstName;
+          this.lastName = lastName;
+      }
+
+      greeting() {
+          return `Hello there ${this.firstName} ${this.lastName}`;
+      }
+  }
+
+
+  class Customers extends People {
+      constructor(firstName, lastName, phone, membership) {
+          super(firstName, lastName);
+
+          this.phone = phone;
+          this.membership = membership;
+      }
+  }
+
+  const john = new Customers('john', 'smith', '555-555-5555', 'standard')
+  console.log(john)
+  console.log(john.greeting())
+#+end_src
