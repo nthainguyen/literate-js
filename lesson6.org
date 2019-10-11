@@ -66,29 +66,54 @@
    },3000);
    }
  #+end_src
+ 
+** Create a prototype to delete based on event listener
 
+#+begin_src js
+  UI.prototype.deleteBook = function(target){
+      if(target.className === 'delete') {
+          target.parentElement.parentElement.remove();
+      }
+  }
+#+end_src
+ 
+**  Create a event listener that delete the book list
 
- define a event handler to handle the submit button, 
- when the button is submitted, the book and the ui instance is instantiated,
- calling the function define in the prototype is pretty much the same as any other oop.
-
- #+begin_src js
-   document.getElementById('book-form').addEventListener('submit', function(e) {
-       const title = document.getElementById('title').value,
-             author = document.getElementById('author').value,
-             isbn = document.getElementById('isbn').value;
-
-       const book = new Book(title, author, isbn);
+#+begin_src js
+  const onClick =function(e) {
        const ui = new UI();
 
-       if(title == '' | author == '' | isbn == ''){
-           ui.showAlert('this is an alert', 'error');
-       } else {
-           ui.addBookToList(book);
-           ui.showAlert('this is an success', 'success');
-           ui.clearField();
-       }
+       ui.deleteBook(e.target);
+
+       ui.showAlert('Book deleted', 'success');
+
        e.preventDefault();
-   });
- #+end_src
+   }
+
+   document.getElementById('book-list').addEventListener('click', onClick)
+#+end_src
+
+** Define a event handler to handle the submit button, 
+  when the button is submitted, the book and the ui instance is instantiated,
+  calling the function define in the prototype is pretty much the same as any other oop.
+
+  #+begin_src js
+    document.getElementById('book-form').addEventListener('submit', function(e) {
+        const title = document.getElementById('title').value,
+              author = document.getElementById('author').value,
+              isbn = document.getElementById('isbn').value;
+
+        const book = new Book(title, author, isbn);
+        const ui = new UI();
+
+        if(title == '' | author == '' | isbn == ''){
+            ui.showAlert('Cannot submit empty fields', 'error');
+        } else {
+            ui.addBookToList(book);
+            ui.showAlert('Book added', 'success');
+            ui.clearField();
+        }
+        e.preventDefault();
+    });
+  #+end_src
 
